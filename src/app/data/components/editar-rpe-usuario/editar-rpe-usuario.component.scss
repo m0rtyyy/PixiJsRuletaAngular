@@ -1,0 +1,230 @@
+p{
+    text-transform: lowercase;
+  }
+  
+  .modal-header{
+    padding: 10px 15px;
+    border-bottom: 2px solid var(--color-principal);
+    background-color: var(--color-principal);
+    border-radius: 0px;
+  
+    .modal-title{
+      font-size: 20px;   
+      color: var(--blanco);
+      font-family: var(--tipo-titulos) !important;
+      font-weight: 400;
+
+      h4::first-letter{
+        text-transform: uppercase;
+      }
+    }
+  
+  
+    img{
+      cursor: pointer;
+      width: 18px;
+    }
+  }
+  
+  .modal-body{
+    padding: 15px;
+
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-direction: column;   
+  
+    div{
+  
+      p{
+        color: var(--color-principal);      
+      }
+  
+      p::first-letter{
+        text-transform: uppercase;
+      }
+    }
+  
+
+  }
+
+  .contenedorContexto{
+
+    .contenedorContextoDiv{
+      margin-bottom: 10px;
+
+      .cuerpo{
+          // width: 50%;
+        .fotoPerfil{
+          // width: 60% !important;
+        }
+
+        
+        .cuerpoInputs{
+
+          .contenedorContextoElemento{
+            p{
+              margin-bottom: 5px;
+              font-size: 14px;
+            }
+      
+            input{
+              width: 100%;
+              padding: 5px 10px;
+            }
+      
+            .p-inputtext:enabled:focus{
+              border-color: var(--color-principal);
+              box-shadow: 0 0 0 0.2rem var(--color-principal-claro);
+            }
+
+            .seIgnora{
+              color: red;
+            }
+          }
+          .detalles{
+
+            .parteIzquierda{
+
+            }
+            .parteDerecha{
+              font-size: 12px;
+
+              .field-checkbox{
+                padding-top: 10px;
+                label{
+                  padding-left: 5px;
+                }
+              }
+            }
+          }
+        }
+      }
+
+  
+
+    } 
+
+    .contenedorContextoDivBotones{
+      margin-top: 10px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      .contenedorContextoDivBoton:first-child {
+        margin: 0 10px 0 0;
+      }
+    }
+
+    .leyenda{
+      justify-content: left !important;
+      font-size: 10px;
+    }
+
+}
+  
+@media(max-width:700px){
+
+}
+
+
+@media(max-width:700px){
+  .contenedorContextoLargo{
+
+    .contenedorContextoLargoDiv{
+      display: grid;
+      grid-template-columns: 1fr 1fr;  
+      grid-gap: 10px;
+      
+      margin-bottom: 10px;
+  
+      .contenedorContextoLargoElemento{
+  
+        p{
+          margin-bottom: 5px;
+          font-size: 14px;
+        }
+  
+        input{
+          width: 100%;
+          padding: 5px 10px;
+        }
+  
+        .p-inputtext:enabled:focus{
+          border-color: var(--color-principal);
+          box-shadow: 0 0 0 0.2rem var(--color-principal-claro);
+        }
+      }
+    } 
+
+
+    .contenedorContextoLargoDivBotones{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      
+    }
+  }
+}
+
+@media(max-width:400px){
+  .contenedorContextoLargo{
+
+    .contenedorContextoLargoDiv{
+      display: grid;
+      grid-template-columns: 1fr;  
+      grid-gap: 10px;
+      
+      margin-bottom: 10px;
+  
+      .contenedorContextoLargoElemento{
+  
+        p{
+          margin-bottom: 5px;
+          font-size: 14px;
+        }
+  
+        input{
+          width: 100%;
+          padding: 5px 10px;
+        }
+  
+        .p-inputtext:enabled:focus{
+          border-color: var(--color-principal);
+          box-shadow: 0 0 0 0.2rem var(--color-principal-claro);
+        }
+      }
+    }
+  }
+}
+
+.botonCrearUsuario{
+    color: var(--blanco);
+    background: var(--color-botones) !important;
+    border: 1px solid var(--color-botones)  !important;
+}
+
+.botonCrearUsuario:hover{
+    color: var(--blanco);
+    background: var(--color-botones-oscuro) !important;
+    border: 1px solid var(--color-botones-oscuro) !important;    
+}
+
+.botonCrearUsuario:focus{
+    box-shadow: 0 0 0 0.2rem  var(--color-botones-claro);
+}
+
+.botonBorrar{
+  color: gray;
+  background: #e4e4e4 !important;
+  border: 1px solid #e4e4e4 !important;
+}
+
+.botonBorrar:hover{
+  color: rgb(255, 255, 255);
+  background: #aaaaaa !important;
+  border: 1px solid #aaaaaa !important;    
+}
+
+.botonBorrar:focus{
+  box-shadow: 0 0 0 0.2rem rgb(224, 224, 224)
+}

@@ -1,0 +1,25 @@
+
+.informacionPerfil{
+    width: 100%;
+    margin-bottom: 2em;
+
+    .cabecero{
+        background-color: rgb(109, 109, 109);
+        font-size: 20px;
+        .subirArchivo{
+            float: right;
+            padding: 5px;
+        }
+    }
+
+    .cuerpo{
+        justify-content: center;
+        .juego{
+            max-width: 800px;
+            height: 100%;
+            width: 100%;
+            max-height: 800px;
+        }
+    }
+
+}

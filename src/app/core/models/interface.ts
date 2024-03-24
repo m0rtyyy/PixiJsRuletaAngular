@@ -1,0 +1,50 @@
+export interface Usuario{
+    id?: number,
+    name?:string,
+    email?:string,
+    nombre?:string,
+    apellido?:string,
+    telefono?:string,
+    edad?:number,
+    altura?:number,
+    peso?:number,
+    dorsal?:number,
+    posicion?: number,
+    verificado?: boolean,
+    categoria?:string,
+    idPerfil?:number,
+    error?:any,
+}
+
+export interface UsuarioBBDD{
+    id?: number,
+    name?:string,
+    email?:string,
+    email_verified_at?:string,
+    password?:string,
+    nombre?:string,
+    apellido?:string,
+    telefono?:string,
+    edad?:number,
+    altura?:number,
+    peso?:number,
+    posicion?: number,
+    verificado?: boolean,
+    categoria?:string,
+    idPerfil?:number,
+    created_at?:string,
+    updated_at?:string,
+}
+
+export interface UsuarioJugador{
+    id?: number,
+    nombre?:string,
+    posicion?: number,
+    dorsal?:number,
+    cansancio_cardio:number,
+    cansancio_piernas:number,
+    estres_cog:number,
+    tiempo_sesion_real:number,
+    cuenta_para_media:number,
+}
+

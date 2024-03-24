@@ -1,0 +1,90 @@
+<div class="modal-header">
+    <div>
+        <h4 class="modal-title">Editar Usuario</h4>
+    </div>
+    <div>
+        <img (click)="closeModal(false)" src="./../../../../assets/img/cerrar.svg" alt="">
+    </div>
+</div>
+
+<div *ngIf="usuarioAEditar" class="modal-body contenedorContexto">
+    <div class="contenedorContextoDiv">
+        <div class="row cuerpo">
+            <div class="fotoPerfil col-sm-6">
+                    <img src="../../../../assets/img/perfil.jpg" class="img-fluid" alt="Responsive image">
+            </div>
+            <div class="cuerpoInputs col-sm-6">
+                <div class="contenedorContextoElemento">
+                    <p>Nombre: </p>
+                    <input disabled [(ngModel)]="usuarioAEditar.nombre" type="text" placeholder="" pInputText />
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 contenedorContextoElemento">
+                        <p>Posicion: </p>        
+                        <input disabled [(ngModel)]="usuarioAEditar.posicion" type="text" pInputText />
+                    </div>
+                    <div class="col-sm-6 contenedorContextoElemento">
+                        <p>E-Dorsal: </p>
+                        <input disabled [(ngModel)]="usuarioAEditar.dorsal" type="text" pInputText />
+                    </div>
+                </div>
+                <div class="row detalles">
+                    <div class="col-sm-6 parteIzquierda">
+                        <div class="contenedorContextoElemento">
+                            <p>Media Cardio Vascular: </p>
+                            <input [disabled]="!mediaCardio || ignorar" [ngClass]="{'seIgnora': ignorar}" [(ngModel)]="usuarioAEditar.cansancio_cardio" type="text" placeholder="" pInputText />
+                        </div>
+                        <div class="contenedorContextoElemento">
+                            <p>Media Muscular: </p>        
+                            <input [disabled]="!mediaMuscular || ignorar" [ngClass]="{'seIgnora': ignorar}" [(ngModel)]="usuarioAEditar.cansancio_piernas" type="text" pInputText />
+                        </div>
+                        <div class="contenedorContextoElemento">
+                            <p>Media Cognitiva: </p>
+                            <input [disabled]="!mediaCognitiva || ignorar" [ngClass]="{'seIgnora': ignorar}" [(ngModel)]="usuarioAEditar.estres_cog" type="text" pInputText />
+                        </div>
+                        <div class="contenedorContextoElemento">
+                            <p>Tiempo Real: </p>
+                            <input [disabled]="!NoCuentaTiempoSesion" [(ngModel)]="usuarioAEditar.tiempo_sesion_real" type="number" pInputText />
+                        </div>
+                    </div>
+                    <div class="col-sm-6 parteDerecha">
+                        <div [hidden]="ignorar" class="field-checkbox">
+                            <p-checkbox  [binary]="true" [(ngModel)]="mediaCardio" inputId="mcd"></p-checkbox>
+                            <label for="mcd">M/Cardio</label>
+                        </div>
+                        <div [hidden]="ignorar" class="field-checkbox">
+                            <p-checkbox [hidden]="ignorar" [binary]="true" [(ngModel)]="mediaMuscular" inputId="mm"></p-checkbox>
+                            <label for="mm">M/Muscular</label>
+                        </div>
+                        <div [hidden]="ignorar" class="field-checkbox">
+                            <p-checkbox [hidden]="ignorar" [binary]="true" [(ngModel)]="mediaCognitiva" inputId="mcg"></p-checkbox>
+                            <label for="mcg">M/Cognitiva</label>
+                        </div>
+                        <div class="field-checkbox">
+                            <p-checkbox [binary]='true' [(ngModel)]="ignorar" inputId="it"></p-checkbox>
+                            <label for="it" style="font-size: bold;">Ignorar toda media</label>
+                        </div>
+                        <div class="field-checkbox">
+                            <p-checkbox [binary]='true' [(ngModel)]="NoCuentaTiempoSesion" inputId="ct"></p-checkbox>
+                            <label for="ct">Tiempo de sesión</label>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>  
+    <div class="contenedorContextoDivBotones">
+        <div class="contenedorContextoDivBoton recuadroContenidoBotonesBoton">
+            <button (click)="closeModal(false)" pButton pRipple type="button" label="Cancelar" class="botonBorrarFiltros p-button-rounded"></button>
+        </div>
+        <div class="contenedorContextoDivBoton recuadroContenidoBotonesBoton">
+            <!-- <button [disabled]="(usuarioAEditar.nombre == null || usuarioAEditar.nombre == '' || usuarioAEditar.apellido == null || usuarioAEditar.apellido == '' || usuarioAEditar.email == null || usuarioAEditar.email == '' || usuarioAEditar.nombreUsuario == null || usuarioAEditar.nombreUsuario == '' || usuarioAEditar.id_Perfil == null || usuarioAEditar.id_Perfil == '')" (click)="editarUsuario(usuarioAEditar)" pButton pRipple type="button" label="Guardar Usuario" class="botonCrearUsuario p-button-rounded"></button> -->
+            <button  (click)="editarUsuario(usuarioAEditar)" pButton pRipple type="button" label="Guardar Usuario" class="botonCrearUsuario p-button-rounded"></button>
+        </div>
+    </div>
+    <div class="leyenda">
+        <p *ngIf="ignorar">*Las medias del recuadro serán obviadas para la media final (No contarán)*</p>
+        <p *ngIf="NoCuentaTiempoSesion">*Aplica el tiempo de sesión real*</p>
+    </div>
+</div>

@@ -1,0 +1,21 @@
+<section class="fondo vh-100">
+  <div class="wrapper">
+    <div [ngClass]="{'loading': estado==1}" class="login">
+      <p class="title">Iniciar Sesion</p>
+      <input [(ngModel)]="usuario" type="text" placeholder="Usuario" autofocus/>
+      <i class="fa fa-user"></i>
+      <input [(ngModel)]="contrasena" type="password" placeholder="Contraseña" />
+      <i class="fa fa-key"></i>
+      <div class="field-checkbox">
+        <p-checkbox [(ngModel)]="remember" [binary]="true" inputId="binary"></p-checkbox>
+        <label for="binary">Recuerdame</label>
+    </div>
+      <a href="#">¿Olvidaste tu contraseña?</a>
+      <button (click)="login(usuario,contrasena,remember)">
+        <i class="spinner"></i>
+        <span class="state">Entrar</span>
+      </button>
+    </div>
+    <!-- <footer><a target="Registroº" href="https://www.instagram.com/davidptraining/">David Personal Trainingº </a></footer> -->
+  </div>
+</section>

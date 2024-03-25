@@ -32,7 +32,7 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
     },
     {
       id:2,
-      nombre:'Mojito',
+      nombre:'Chupito',
       orden: [4,5,6],
       color:null,
       img: 'chupito'
@@ -46,35 +46,35 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
     },
     {
       id:4,
-      nombre:'Mojito',
+      nombre:'Cerveza',
       orden: [7,8,9],
       color:null,
       img: 'copa'
     },
     {
       id:5,
-      nombre:'Mojito',
+      nombre:'Refresco',
       orden: [7,8,9],
       color:null,
       img: 'refresco'
     },
-    // {
-    //   id:6,
-    //   nombre:'Mojito',
-    //   orden: [7,8,9],
-    //   color:null,
-    //   img: 'mysterybox'
-    // },
     {
       id:6,
-      nombre:'Mojito',
+      nombre:'Mystery Box',
+      orden: [7,8,9],
+      color:null,
+      img: 'mysterybox'
+    },
+    {
+      id:6,
+      nombre:'Tu canción',
       orden: [7,8,9],
       color:null,
       img: 'tucancion'
     },
     {
       id:6,
-      nombre:'Mojito',
+      nombre:'Nada',
       orden: [7,8,9],
       color:null,
       img: 'nada'
@@ -177,7 +177,7 @@ createBackground() {
     
     // Crea la ruleta con el nuevo centro y radio.
     this.ruleta = new Ruleta(this.app, radio, centro);
-    this.container.addEventListener('pointerup', () => this.ruleta.girarRuleta(1000));
+    this.container.addEventListener('pointerup', () => this.ruleta.girarRuleta(10000));
 
     this.ruleta.generarRuleta(this.premios); // Pasamos el array completo de premios
   }

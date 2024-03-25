@@ -31,7 +31,6 @@ export class Ruleta {
 
       // No necesitas crear la Flecha aquí si va a ser un elemento estático fuera del contenedor de la ruleta
       // const flecha = new Flecha(this.app, this.centro, this.radio);
-      this.getSegmentoApuntadoPorFlecha();
   }
 
   private crearSegmentos(imagenesURLs: string[], colores: number[]): void {
@@ -54,28 +53,47 @@ export class Ruleta {
     this.container.y = this.centro.y;
 }
 
-    getSegmentoApuntadoPorFlecha(): Segmento | null {
-      // Asume que la flecha apunta directamente hacia abajo, ajusta según la orientación actual
-      const anguloFlecha = Math.PI * 3 / 2; // 270 grados en radianes
+getSegmentoApuntadoPorFlecha(): Segmento | null {
+  // Asume que la flecha apunta directamente hacia abajo en la posición inicial
+  // Calcula el ángulo absoluto de la flecha considerando la rotación del contenedor
+  const anguloAbsolutoFlecha = (Math.PI * 3 / 2 ) % (Math.PI * 2);
+  console.log(anguloAbsolutoFlecha);
   
-      // Encuentra el segmento que contenga este ángulo
-      for (let segmento of this.segmentosInstancias) {
-          // Ajusta los ángulos si es necesario para que estén en el mismo rango que anguloFlecha
-          if (segmento.anguloInicio <= anguloFlecha && segmento.anguloFin >= anguloFlecha) {
-              return segmento;
-          }
+  for (let segmento of this.segmentosInstancias) {
+    console.log(segmento);
+    
+    // Calcula los ángulos de inicio y fin absolutos del segmento considerando la rotación del contenedor
+    let anguloInicioAbsoluto = (segmento.anguloInicio + this.container.rotation) % (Math.PI * 2);
+    let anguloFinAbsoluto = (segmento.anguloFin + this.container.rotation) % (Math.PI * 2);
+    console.log(anguloInicioAbsoluto,anguloFinAbsoluto);
+
+
+    // Asegúrate de que los ángulos están en el rango [0, 2 * PI]
+    if (anguloInicioAbsoluto < 0) anguloInicioAbsoluto += Math.PI * 2;
+    if (anguloFinAbsoluto < 0) anguloFinAbsoluto += Math.PI * 2;
+
+    // Si el anguloAbsolutoFlecha está entre anguloInicioAbsoluto y anguloFinAbsoluto, hemos encontrado el segmento
+    if (anguloInicioAbsoluto < anguloFinAbsoluto) {
+      if (anguloAbsolutoFlecha >= anguloInicioAbsoluto && anguloAbsolutoFlecha <= anguloFinAbsoluto) {
+        return segmento;
       }
-  
-      // Si no se encuentra ningún segmento, retorna null
-      return null;
+    } else {
+      // Este bloque maneja el caso donde el segmento cruza el ángulo 0 (360 grados)
+      if (anguloAbsolutoFlecha >= anguloInicioAbsoluto || anguloAbsolutoFlecha <= anguloFinAbsoluto) {
+        return segmento;
+      }
+    }
   }
+
+  return null;
+}
 
   girarRuleta(duracion: number): void {
     // Tiempo total de la animación en milisegundos
     let tiempoRestante = duracion;
     
     // Velocidad inicial y desaceleración calculada para terminar exactamente en 'duracion' ms
-    let velocidadRotacion = Math.PI * 4; // Velocidad inicial en radianes por segundo, ajusta a tu preferencia
+    let velocidadRotacion = Math.PI * 10; // Velocidad inicial en radianes por segundo, ajusta a tu preferencia
     const desaceleracionPorSegundo = velocidadRotacion / duracion; // Calcula la desaceleración necesaria
 
     const girar = (delta) => {

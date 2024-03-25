@@ -177,7 +177,7 @@ createBackground() {
     
     // Crea la ruleta con el nuevo centro y radio.
     this.ruleta = new Ruleta(this.app, radio, centro);
-    this.container.addEventListener('click', () => this.ruleta.girarRuleta(1000));
+    this.container.addEventListener('pointerup', () => this.ruleta.girarRuleta(1000));
 
     this.ruleta.generarRuleta(this.premios); // Pasamos el array completo de premios
   }

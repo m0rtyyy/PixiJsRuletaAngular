@@ -2,12 +2,12 @@ import * as PIXI from 'pixi.js';
 
 export class Segmento {
     public container: PIXI.Container;
-    private app: PIXI.Application;
-    private centro: { x: number; y: number };
-    private radio: number;
-    private anguloInicio: number;
-    private anguloFin: number;
-    private imagenURL: string;
+     app: PIXI.Application;
+     centro: { x: number; y: number };
+     radio: number;
+     anguloInicio: number;
+     anguloFin: number;
+     imagenURL: string;
   
     constructor(app: PIXI.Application, centro: { x: number; y: number }, radio: number, anguloInicio: number, anguloFin: number, imagenURL: string) {
       this.app = app;

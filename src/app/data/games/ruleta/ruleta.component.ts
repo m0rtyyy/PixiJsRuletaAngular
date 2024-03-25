@@ -43,6 +43,41 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
       orden: [7,8,9],
       color:null,
       img: 'cerveza'
+    },
+    {
+      id:4,
+      nombre:'Mojito',
+      orden: [7,8,9],
+      color:null,
+      img: 'copa'
+    },
+    {
+      id:5,
+      nombre:'Mojito',
+      orden: [7,8,9],
+      color:null,
+      img: 'refresco'
+    },
+    // {
+    //   id:6,
+    //   nombre:'Mojito',
+    //   orden: [7,8,9],
+    //   color:null,
+    //   img: 'mysterybox'
+    // },
+    {
+      id:6,
+      nombre:'Mojito',
+      orden: [7,8,9],
+      color:null,
+      img: 'tucancion'
+    },
+    {
+      id:6,
+      nombre:'Mojito',
+      orden: [7,8,9],
+      color:null,
+      img: 'nada'
     }
   ]
 
@@ -60,7 +95,11 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
       'mojito': 'assets/sprites/mojito.jpg',
       'chupito': 'assets/sprites/chupito.jpg',
       'cerveza': 'assets/sprites/cerveza.jpg',
-      'madera': 'assets/sprites/madera.jpg'
+      'copa': 'assets/sprites/copa.jpg',
+      'refresco': 'assets/sprites/refresco.jpg',
+      'tucancion': 'assets/sprites/tucancion.jpg',
+      'mysterybox': 'assets/sprites/mysterybox.jpg',
+      'nada': 'assets/sprites/nada.jpg'
     };
   
     // Añadir todos los assets al bundle

@@ -17,30 +17,16 @@ export class Segmento {
       this.anguloFin = anguloFin;
       this.imagenURL = imagenURL;
       this.container = new PIXI.Container(); // Un contenedor para mantener el sprite y la máscara juntos
+      this.container.sortableChildren = true;
 
-      this.cargarImagen();
+      this.cargarSegmentos();
     }
   
-    private cargarImagen(): void {
+    private cargarSegmentos(): void {
         const texture = PIXI.Assets.get(this.imagenURL);
         if (texture) {
-            const sprite = new PIXI.Sprite(texture);
-
-            // Ajuste simplificado del tamaño del sprite
-            const escala = this.radio / Math.max(sprite.width, sprite.height);
-            sprite.scale.set(escala);
-    
-            // Posicionamiento simplificado basado en el centro y el radio
-            sprite.x = this.centro.x + this.radio * Math.cos(this.anguloInicio + (this.anguloFin - this.anguloInicio) / 2) - sprite.width / 2;
-            sprite.y = this.centro.y + this.radio * Math.sin(this.anguloInicio + (this.anguloFin - this.anguloInicio) / 2) - sprite.height / 2;
-    
-
-            const mask = new PIXI.Graphics();
-            mask.beginFill(0xffffff); // El color aquí no importa
-            mask.moveTo(this.centro.x, this.centro.y);
-            mask.arc(this.centro.x, this.centro.y, this.radio, this.anguloInicio, this.anguloFin);
-            mask.lineTo(this.centro.x, this.centro.y);
-            mask.endFill();
+            const sprite = this.crearSprite(texture)
+            const mask = this.crearMascara();
 
             sprite.mask = mask; // Aplica la máscara
 
@@ -48,12 +34,7 @@ export class Segmento {
             const woodTexture = PIXI.Assets.get("madera");
             if (woodTexture) {
                 // Dibuja el borde del segmento con la textura de madera
-                const woodBorder = new PIXI.Graphics();
-                woodBorder.lineStyle({ width: 5, color: 0xFFFFFF, texture: woodTexture }); // Ajusta el ancho del borde según sea necesario
-                woodBorder.moveTo(this.centro.x, this.centro.y);
-                woodBorder.arc(this.centro.x, this.centro.y, this.radio, this.anguloInicio, this.anguloFin);
-                woodBorder.lineTo(this.centro.x, this.centro.y);
-
+                const woodBorder = this.crearBorde(woodTexture);
                 // No es necesario aplicar una máscara al borde en este caso
                 this.container.addChild(woodBorder);
             }
@@ -64,7 +45,57 @@ export class Segmento {
             this.app.stage.addChild(this.container);
         }
     }
+
+    crearSprite(texture: PIXI.Texture): PIXI.Sprite {
+      const sprite = new PIXI.Sprite(texture);
   
+      // Calcula la escala base para ajustar la imagen dentro del segmento
+      const escalaBase = this.radio / Math.max(sprite.width, sprite.height);
+  
+      // Incrementa la escala para hacer la imagen más grande, según sea necesario
+      const factorDeAumento = 1.8; // Modifica este valor para ajustar el tamaño de la imagen
+      const escalaAjustada = escalaBase * factorDeAumento;
+      sprite.scale.set(escalaAjustada);
+  
+      // Calcula el punto medio del ángulo del segmento para encontrar la bisectriz
+      const puntoMedioAngulo = this.anguloInicio + (this.anguloFin - this.anguloInicio) / 2;
+  
+      // Calcula la posición del sprite para que esté centrado en la bisectriz del segmento
+      // Aquí, no necesitas ajustar por `sprite.width` o `sprite.height` debido al anchor
+      sprite.x = this.centro.x + (this.radio * 0.75) * Math.cos(puntoMedioAngulo);
+      sprite.y = this.centro.y + (this.radio * 0.75) * Math.sin(puntoMedioAngulo);
+  
+      sprite.anchor.set(0.5);
+      sprite.zIndex = 0; // Asegura que el sprite tenga un zIndex más bajo
+
+  
+      return sprite;
+  }
+
+    crearMascara(){
+      const mask = new PIXI.Graphics();
+      mask.beginFill(0xffffff); // El color aquí no importa
+      mask.moveTo(this.centro.x, this.centro.y);
+      mask.arc(this.centro.x, this.centro.y, this.radio, this.anguloInicio, this.anguloFin);
+      mask.lineTo(this.centro.x, this.centro.y);
+      mask.endFill();
+      return mask
+    }
+
+     crearBorde(texture) {
+      const woodBorder = new PIXI.Graphics();
+      woodBorder.lineStyle({ width: 10, color: 0xFFFFFF, texture: texture }); // Ajusta el ancho del borde según sea necesario
+      woodBorder.moveTo(this.centro.x, this.centro.y);
+      woodBorder.arc(this.centro.x, this.centro.y, this.radio, this.anguloInicio, this.anguloFin);
+      woodBorder.lineTo(this.centro.x, this.centro.y);
+      woodBorder.zIndex=1;
+      // Configurar el borde aquí
+      // Nota: PIXI.Graphics.lineStyle no soporta texturas directamente en PixiJS v5.
+      // Para efectos avanzados como bordes con textura, considera usar sprites o meshes.
+      return woodBorder;
+  }
+
+
     public destruir(): void {
       this.container.destroy({ children: true, texture: true, baseTexture: true });
     }

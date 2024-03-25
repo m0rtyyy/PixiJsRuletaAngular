@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { Segmento } from './segmento'; // Ajusta la ruta de importación según sea necesario
+import { Flecha } from './flecha';
 
 
 export class Ruleta {
@@ -20,10 +21,12 @@ export class Ruleta {
         this.segmentos = premios.length;
         const imagenesURLs = premios.map(p => p.img);
         const colores = premios.map(p => p.color); // Asumiendo que quieres usar el color aquí
-        this.dividirEnSegmentos(imagenesURLs, colores);
+        this.crearSegmentos(imagenesURLs, colores);
+        const flecha = new Flecha(this.app, this.centro, this.radio);
+
       }
   
-      private dividirEnSegmentos(imagenesURLs: string[], colores: number[]): void {
+      private crearSegmentos(imagenesURLs: string[], colores: number[]): void {
         this.limpiarSegmentos();
         
         for (let i = 0; i < this.segmentos; i++) {

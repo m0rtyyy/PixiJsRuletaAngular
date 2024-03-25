@@ -92,6 +92,7 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
     // Definir todos los assets necesarios, incluidas las imágenes de los segmentos
     const assets: PIXI.ResolverAssetsObject = {
       'bg': 'assets/sprites/bg.png',
+      'flecha': 'assets/sprites/flecha.png',
       'mojito': 'assets/sprites/mojito.jpg',
       'chupito': 'assets/sprites/chupito.jpg',
       'cerveza': 'assets/sprites/cerveza.jpg',
@@ -169,7 +170,7 @@ createBackground() {
     
     // El centro en Y se calcula para mantener el margen superior de 50px.
     // Es importante ajustar este cálculo si cambias el margen inferior.
-    const centroY = margenSuperior + radio - 40;
+    const centroY = margenSuperior + radio - 35;
     
     // Asegúrate de que el centro y el radio calculados se ajustan a tus necesidades.
     const centro = { x: this.parent.offsetWidth / 2, y: centroY };

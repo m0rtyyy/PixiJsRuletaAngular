@@ -12,7 +12,7 @@ export class Ruleta {
      segmentosInstancias: Segmento[] = [];
      flecha: any;
      premios:any;
-     premiosGanadores = [1, 2, 3, 4]; // Por ejemplo, los id de los segmentos
+     premiosGanadores = [1, 2, 8, 3, 4]; // Por ejemplo, los id de los segmentos
      // Agrega esta variable a tu clase Ruleta para rastrear la posición final después de cada giro.
      anguloActual: number = 0;
 
@@ -113,47 +113,88 @@ export class Ruleta {
   }
 
 
-  girarRuleta(vueltas: number): void {
-    let premioID = this.obtenerSiguientePremio(); // Devuelve el ID del premio
-    let indiceSegmentoObjetivo = this.premios.findIndex(p => p.id === premioID);
+//   girarRuleta(vueltas: number): void {
+//     let premioID = this.obtenerSiguientePremio(); // Devuelve el ID del premio
+//     let indiceSegmentoObjetivo = this.premios.findIndex(p => p.id === premioID);
     
+//     // Calculamos el ángulo por segmento basado en el número total de premios.
+//     const anguloPorSegmento = (2 * Math.PI) / this.premios.length;
   
-    // Calculamos el ángulo por segmento basado en el número total de premios.
-    const anguloPorSegmento = (2 * Math.PI) / this.premios.length;
+//     // El ángulo objetivo ajusta para que la flecha termine en la bisectriz del segmento ganador.
+//     // Consideramos el ángulo inicial de la ruleta para que la flecha apunte al inicio del primer segmento.
+//     let anguloObjetivo = -Math.PI / 2 + anguloPorSegmento * (-(indiceSegmentoObjetivo)) - anguloPorSegmento / 2;
   
-    // El ángulo objetivo ajusta para que la flecha termine en la bisectriz del segmento ganador.
-    // Consideramos el ángulo inicial de la ruleta para que la flecha apunte al inicio del primer segmento.
-    let anguloObjetivo = -Math.PI / 2 + anguloPorSegmento * (-(indiceSegmentoObjetivo)) - anguloPorSegmento / 2;
+//     // Añadimos vueltas extra para hacer el giro más interesante.
+//     anguloObjetivo += vueltas * 2 * Math.PI;
   
-    // Añadimos vueltas extra para hacer el giro más interesante.
-    anguloObjetivo += vueltas * 2 * Math.PI;
+//     // Aseguramos que el giro sea en sentido horario ajustando la rotación final.
+//     let diferenciaAngulo = anguloObjetivo - (this.container.rotation % (2 * Math.PI));
+//     if (diferenciaAngulo < 0) diferenciaAngulo += 2 * Math.PI;
   
-    // Aseguramos que el giro sea en sentido horario ajustando la rotación final.
-    let diferenciaAngulo = anguloObjetivo - (this.container.rotation % (2 * Math.PI));
-    if (diferenciaAngulo < 0) diferenciaAngulo += 2 * Math.PI;
+//     let duracion = 5; // Duración de la animación en segundos.
+//     let tiempoInicial = Date.now();
+//     let anguloInicial = this.container.rotation;
   
-    let duracion = 5; // Duración de la animación en segundos.
-    let tiempoInicial = Date.now();
-    let anguloInicial = this.container.rotation;
+//     const girar = () => {
+//       let ahora = Date.now();
+//       let tiempoTranscurrido = (ahora - tiempoInicial) / 1000; // Convertimos a segundos.
+//       let fraccion = tiempoTranscurrido / duracion;
   
-    const girar = () => {
-      let ahora = Date.now();
-      let tiempoTranscurrido = (ahora - tiempoInicial) / 1000; // Convertimos a segundos.
-      let fraccion = tiempoTranscurrido / duracion;
+//       if (fraccion >= 1) {
+//         this.container.rotation = anguloInicial + diferenciaAngulo; // Asegura terminar en el ángulo objetivo.
+//         this.app.ticker.remove(girar);
+//         console.log("Animación completada");
+//         return;
+//       }
   
-      if (fraccion >= 1) {
-        this.container.rotation = anguloInicial + diferenciaAngulo; // Asegura terminar en el ángulo objetivo.
-        this.app.ticker.remove(girar);
-        console.log("Animación completada");
-        return;
-      }
+//       // Aplicamos una función de easing para suavizar la animación.
+//       let posicionActual = anguloInicial + diferenciaAngulo * (1 - Math.pow(1 - fraccion, 3));
+//       this.container.rotation = posicionActual;
+//     };
   
-      // Aplicamos una función de easing para suavizar la animación.
-      let posicionActual = anguloInicial + diferenciaAngulo * (1 - Math.pow(1 - fraccion, 3));
-      this.container.rotation = posicionActual;
-    };
+//     this.app.ticker.add(girar);
+// }
+
+girarRuleta(vueltas: number): void {
+  let premioID = this.obtenerSiguientePremio(); // Devuelve el ID del premio
+  let indiceSegmentoObjetivo = this.premios.findIndex(p => p.id === premioID);
   
-    this.app.ticker.add(girar);
+  // Calculamos el ángulo por segmento basado en el número total de premios.
+  const anguloPorSegmento = (2 * Math.PI) / this.premios.length;
+
+  // El ángulo objetivo ajusta para que la flecha termine en la bisectriz del segmento ganador.
+  // Consideramos el ángulo inicial de la ruleta para que la flecha apunte al inicio del primer segmento.
+  let anguloObjetivo = -Math.PI / 2 + anguloPorSegmento * (-(indiceSegmentoObjetivo)) - anguloPorSegmento / 2;
+
+  // Añadimos vueltas extra para hacer el giro más interesante.
+  anguloObjetivo += vueltas * 2 * Math.PI;
+
+  // Aseguramos que el giro sea en sentido horario ajustando la rotación final.
+  let diferenciaAngulo = anguloObjetivo - (this.container.rotation % (2 * Math.PI));
+  if (diferenciaAngulo < 0) diferenciaAngulo += 2 * Math.PI;
+
+  let duracion = 5; // Duración de la animación en segundos.
+  let tiempoInicial = Date.now();
+  let anguloInicial = this.container.rotation;
+
+  const girar = () => {
+    let ahora = Date.now();
+    let tiempoTranscurrido = (ahora - tiempoInicial) / 1000; // Convertimos a segundos.
+    let fraccion = tiempoTranscurrido / duracion;
+
+    if (fraccion >= 1) {
+      this.container.rotation = anguloInicial + diferenciaAngulo; // Asegura terminar en el ángulo objetivo.
+      this.app.ticker.remove(girar);
+      console.log("Animación completada");
+      return;
+    }
+
+    // Aplicamos una función de easing para suavizar la animación.
+    let posicionActual = anguloInicial + diferenciaAngulo * (1 - Math.pow(1 - fraccion, 3));
+    this.container.rotation = posicionActual;
+  };
+
+  this.app.ticker.add(girar);
 }
 
 

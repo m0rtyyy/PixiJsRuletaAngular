@@ -12,7 +12,7 @@ export class Ruleta {
      segmentosInstancias: Segmento[] = [];
      flecha: any;
      premios:any;
-     premiosGanadores = [1, 2, 3, 4]; // Por ejemplo, los índices de los segmentos
+     premiosGanadores = [1, 2, 3, 4]; // Por ejemplo, los id de los segmentos
      // Agrega esta variable a tu clase Ruleta para rastrear la posición final después de cada giro.
      anguloActual: number = 0;
 
@@ -45,6 +45,7 @@ export class Ruleta {
       // const flecha = new Flecha(this.app, this.centro, this.radio);
   }
 
+  //Crea los segmentos que conforma la ruleta
   private crearSegmentos(imagenesURLs: string[], colores: number[]): void {
     this.limpiarSegmentos();
 
@@ -77,6 +78,7 @@ export class Ruleta {
     this.container.rotation = -Math.PI / 2 - (anguloPorSegmento /2);
 }
 
+//Obtiene el segmento el cual está apuntando la flecha (situada a 90º del centro de la ruleta)
   getSegmentoApuntadoPorFlecha(): Segmento | null {
     // Asume que la flecha apunta directamente hacia abajo en la posición inicial
     // Calcula el ángulo absoluto de la flecha considerando la rotación del contenedor
@@ -110,57 +112,52 @@ export class Ruleta {
     return null;
   }
 
+
   girarRuleta(vueltas: number): void {
-    // Tiempo en el que inicia la animación, en milisegundos.
+    let premioID = this.obtenerSiguientePremio(); // Devuelve el ID del premio
+    let indiceSegmentoObjetivo = this.premios.findIndex(p => p.id === premioID);
+    
+  
+    // Calculamos el ángulo por segmento basado en el número total de premios.
+    const anguloPorSegmento = (2 * Math.PI) / this.premios.length;
+  
+    // El ángulo objetivo ajusta para que la flecha termine en la bisectriz del segmento ganador.
+    // Consideramos el ángulo inicial de la ruleta para que la flecha apunte al inicio del primer segmento.
+    let anguloObjetivo = -Math.PI / 2 + anguloPorSegmento * (-(indiceSegmentoObjetivo)) - anguloPorSegmento / 2;
+  
+    // Añadimos vueltas extra para hacer el giro más interesante.
+    anguloObjetivo += vueltas * 2 * Math.PI;
+  
+    // Aseguramos que el giro sea en sentido horario ajustando la rotación final.
+    let diferenciaAngulo = anguloObjetivo - (this.container.rotation % (2 * Math.PI));
+    if (diferenciaAngulo < 0) diferenciaAngulo += 2 * Math.PI;
+  
+    let duracion = 5; // Duración de la animación en segundos.
     let tiempoInicial = Date.now();
-    
-    // Ángulo inicial de la ruleta en el momento que comienza la animación.
     let anguloInicial = this.container.rotation;
-    
-    // Número de vueltas completas que queremos que dé la ruleta durante la animación.
-    // let vueltas = 1;
-
-    // Duración de la animación del giro (tanto para incrementar velocidad como para decrecer la velocidad)
-    let duracion = 5;
-
-    // Distancia total a recorrer en radianes. Cada vuelta completa es 2 * Math.PI radianes.
-    let distanciaTotal = vueltas * 2 * Math.PI;
-    
-    // Función que se ejecutará en cada tick del ticker de la aplicación PIXI.
+  
     const girar = () => {
-        // Calculamos el tiempo actual para saber cuánto ha transcurrido desde que inició la animación.
-        let ahora = Date.now();
-        let tiempoTranscurrido = ahora - tiempoInicial;
-        
-        // Calculamos la fracción del tiempo transcurrido respecto a la duración total de la animación.
-        // Esto nos dará un valor entre 0 y 1 que representa el progreso de la animación.
-        let fraccion = tiempoTranscurrido / (duracion * 1000);
-        
-        // Si la fracción es 1 o mayor, significa que el tiempo de la animación ha terminado.
-        if (fraccion >= 1) {
-            // Detenemos la animación y aseguramos que la ruleta vuelva a su posición inicial.
-            this.container.rotation = anguloInicial;
-            this.app.ticker.remove(girar);
-            console.log(this.getSegmentoApuntadoPorFlecha());
-            
-            console.log("Animación completada");
-            return;
-        }
-        
-        // Calculamos la posición actual de la ruleta usando una función de easing.
-        // En este caso, usamos un ease-out cúbico para que la desaceleración sea más suave.
-        let posicionActual = anguloInicial + distanciaTotal * (1 - Math.pow(1 - fraccion, 3));
-        
-        // Aplicamos la rotación calculada al contenedor de la ruleta.
-        this.container.rotation = posicionActual;
+      let ahora = Date.now();
+      let tiempoTranscurrido = (ahora - tiempoInicial) / 1000; // Convertimos a segundos.
+      let fraccion = tiempoTranscurrido / duracion;
+  
+      if (fraccion >= 1) {
+        this.container.rotation = anguloInicial + diferenciaAngulo; // Asegura terminar en el ángulo objetivo.
+        this.app.ticker.remove(girar);
+        console.log("Animación completada");
+        return;
+      }
+  
+      // Aplicamos una función de easing para suavizar la animación.
+      let posicionActual = anguloInicial + diferenciaAngulo * (1 - Math.pow(1 - fraccion, 3));
+      this.container.rotation = posicionActual;
     };
-
-    // Añadimos la función 'girar' al ticker de PIXI para que se ejecute en cada frame.
+  
     this.app.ticker.add(girar);
 }
 
 
-
+//Obtiene de nuestro array de premios el segmento que tiene que salir en la tirada
   obtenerSiguientePremio(): number | null {
     if (this.premiosGanadores.length > 0) {
       const siguientePremio = this.premiosGanadores[0];

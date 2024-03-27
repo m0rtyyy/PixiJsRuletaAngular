@@ -8,9 +8,11 @@ export class Segmento {
      anguloInicio: number;
      anguloFin: number;
      imagenURL: string;
+     id:any;
   
-    constructor(app: PIXI.Application, centro: { x: number; y: number }, radio: number, anguloInicio: number, anguloFin: number, imagenURL: string) {
+    constructor(app: PIXI.Application, centro: { x: number; y: number }, radio: number, anguloInicio: number, anguloFin: number, imagenURL: string,indexDeFoto:any) {
       this.app = app;
+      this.id = indexDeFoto;
       this.centro = centro;
       this.radio = radio;
       this.anguloInicio = anguloInicio;
@@ -54,6 +56,7 @@ export class Segmento {
   
       // Incrementa la escala para hacer la imagen más grande, según sea necesario
       const factorDeAumento = 1.8; // Modifica este valor para ajustar el tamaño de la imagen
+
       const escalaAjustada = escalaBase * factorDeAumento;
       sprite.scale.set(escalaAjustada);
   
@@ -84,11 +87,11 @@ export class Segmento {
 
      crearBorde(texture) {
       const woodBorder = new PIXI.Graphics();
-      woodBorder.lineStyle({ width: 10, color: 0xFFFFFF, texture: texture }); // Ajusta el ancho del borde según sea necesario
+      woodBorder.lineStyle({ width: 20, color: 0xFFFFFF, texture: texture }); // Ajusta el ancho del borde según sea necesario
       woodBorder.moveTo(this.centro.x, this.centro.y);
       woodBorder.arc(this.centro.x, this.centro.y, this.radio, this.anguloInicio, this.anguloFin);
       woodBorder.lineTo(this.centro.x, this.centro.y);
-      woodBorder.zIndex=1;
+      woodBorder.zIndex=98;
       // Configurar el borde aquí
       // Nota: PIXI.Graphics.lineStyle no soporta texturas directamente en PixiJS v5.
       // Para efectos avanzados como bordes con textura, considera usar sprites o meshes.

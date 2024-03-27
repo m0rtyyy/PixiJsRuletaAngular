@@ -11,7 +11,10 @@ export class Ruleta {
      segmentos: number;
      segmentosInstancias: Segmento[] = [];
      flecha: any;
+     premios:any;
      premiosGanadores = [1, 2, 3, 4]; // Por ejemplo, los índices de los segmentos
+     // Agrega esta variable a tu clase Ruleta para rastrear la posición final después de cada giro.
+     anguloActual: number = 0;
 
     
     constructor(app: PIXI.Application, radio: number, centro: { x: number; y: number }) {
@@ -25,11 +28,16 @@ export class Ruleta {
     }
   
     generarRuleta(premios: any[]): void {
+      this.premios = premios;
       this.segmentos = premios.length;
       const imagenesURLs = premios.map(p => p.img);
       const colores = premios.map(p => p.color);
       this.crearSegmentos(imagenesURLs, colores);
       this.flecha = new Flecha(this.app, this.centro, this.radio);
+      console.log(this.segmentosInstancias);
+      console.log(this.getSegmentoApuntadoPorFlecha());
+      
+
 
       
 
@@ -39,22 +47,34 @@ export class Ruleta {
 
   private crearSegmentos(imagenesURLs: string[], colores: number[]): void {
     this.limpiarSegmentos();
-    // Centro imaginario de la ruleta en el contenedor
-    const centroX = 0; // El contenedor girará alrededor de este punto
-    const centroY = 0; // El contenedor girará alrededor de este punto
 
+    const anguloTotal = 2 * Math.PI; // Total de 360 grados en radianes.
+    const anguloPorSegmento = anguloTotal / this.segmentos;
+
+    // Ajustamos para que la bisectriz del primer segmento apunte hacia abajo (π/2 radianes)
+    // Esto significa que el primer segmento debería estar orientado de tal manera que su punto medio
+    // (bisectriz) esté alineado con π/2 radianes. Sin embargo, como la flecha apunta hacia abajo, 
+    // queremos que este punto medio esté alineado con la dirección de la flecha.
     for (let i = 0; i < this.segmentos; i++) {
-        const anguloInicio = (2 * Math.PI / this.segmentos) * i;
-        const anguloFin = (2 * Math.PI / this.segmentos) * (i + 1);
+        // Calculamos los ángulos de inicio y fin para cada segmento asegurando la correcta orientación.
+        const anguloInicio = i * anguloPorSegmento;
+        const anguloFin = (i + 1) * anguloPorSegmento;
+
         const imagenURL = imagenesURLs[i];
-        const color = colores[i] || Math.random() * 0xFFFFFF;
-        
-        const segmento = new Segmento(this.app, { x: centroX, y: centroY }, this.radio, anguloInicio, anguloFin, imagenURL);
-        this.container.addChild(segmento.container); // Añade el contenedor del segmento al contenedor de la ruleta
+
+        // Creamos el segmento con los ángulos calculados.
+        const segmento = new Segmento(this.app, {x: 0, y: 0}, this.radio, anguloInicio, anguloFin, imagenURL, i);
+        this.container.addChild(segmento.container);
         this.segmentosInstancias.push(segmento);
     }
+
+    // Ajustar la posición del contenedor de la ruleta al centro especificado.
     this.container.x = this.centro.x;
     this.container.y = this.centro.y;
+
+    // Asegurar que la ruleta esté rotada adecuadamente para alinear la bisectriz del primer segmento
+    // con la dirección en que apunta la flecha. Esto puede requerir rotar el contenedor de la ruleta.
+    this.container.rotation = -Math.PI / 2 - (anguloPorSegmento /2);
 }
 
   getSegmentoApuntadoPorFlecha(): Segmento | null {
@@ -90,72 +110,56 @@ export class Ruleta {
     return null;
   }
 
-  girarRuleta(duracion: number): void {
-    // Tiempo total de la animación en milisegundos
-    let tiempoRestante = duracion;
+  girarRuleta(vueltas: number): void {
+    // Tiempo en el que inicia la animación, en milisegundos.
+    let tiempoInicial = Date.now();
     
-    let indexSegmentoGanador = this.obtenerSiguientePremio();
-    console.log(this.premiosGanadores);
+    // Ángulo inicial de la ruleta en el momento que comienza la animación.
+    let anguloInicial = this.container.rotation;
     
-    // Velocidad inicial y desaceleración calculada para terminar exactamente en 'duracion' ms
-    let velocidadRotacion = this.calcularVelocidadInicialParaSegmentoGanador(indexSegmentoGanador, duracion);
+    // Número de vueltas completas que queremos que dé la ruleta durante la animación.
+    // let vueltas = 1;
 
-    // let velocidadRotacion = Math.PI * 10; // Velocidad inicial en radianes por segundo, ajusta a tu preferencia
-    const desaceleracionPorSegundo = velocidadRotacion / duracion; // Calcula la desaceleración necesaria
+    // Duración de la animación del giro (tanto para incrementar velocidad como para decrecer la velocidad)
+    let duracion = 5;
 
-    const girar = (delta) => {
-        // Calcula el cambio de tiempo desde el último frame
-        const deltaTiempo = this.app.ticker.elapsedMS;
-        tiempoRestante -= deltaTiempo;
+    // Distancia total a recorrer en radianes. Cada vuelta completa es 2 * Math.PI radianes.
+    let distanciaTotal = vueltas * 2 * Math.PI;
+    
+    // Función que se ejecutará en cada tick del ticker de la aplicación PIXI.
+    const girar = () => {
+        // Calculamos el tiempo actual para saber cuánto ha transcurrido desde que inició la animación.
+        let ahora = Date.now();
+        let tiempoTranscurrido = ahora - tiempoInicial;
         
-        // Disminuye la velocidad basado en la desaceleración
-        velocidadRotacion -= desaceleracionPorSegundo * deltaTiempo;
+        // Calculamos la fracción del tiempo transcurrido respecto a la duración total de la animación.
+        // Esto nos dará un valor entre 0 y 1 que representa el progreso de la animación.
+        let fraccion = tiempoTranscurrido / (duracion * 1000);
         
-        // Asegura que la velocidad no sea negativa
-        velocidadRotacion = Math.max(0, velocidadRotacion);
-
-        // Aplica la rotación al contenedor de la ruleta
-        this.container.rotation += velocidadRotacion * deltaTiempo / 1000; // Convierte de ms a s
-        
-        // Verifica si el tiempo de animación ha terminado
-        if (tiempoRestante <= 0) {
+        // Si la fracción es 1 o mayor, significa que el tiempo de la animación ha terminado.
+        if (fraccion >= 1) {
+            // Detenemos la animación y aseguramos que la ruleta vuelva a su posición inicial.
+            this.container.rotation = anguloInicial;
             this.app.ticker.remove(girar);
-            // Aquí puedes manejar el evento de finalización, como determinar el segmento ganador
-            var segmentoGanador = this.getSegmentoApuntadoPorFlecha();
-            console.log(segmentoGanador.imagenURL);
+            console.log(this.getSegmentoApuntadoPorFlecha());
             
+            console.log("Animación completada");
+            return;
         }
+        
+        // Calculamos la posición actual de la ruleta usando una función de easing.
+        // En este caso, usamos un ease-out cúbico para que la desaceleración sea más suave.
+        let posicionActual = anguloInicial + distanciaTotal * (1 - Math.pow(1 - fraccion, 3));
+        
+        // Aplicamos la rotación calculada al contenedor de la ruleta.
+        this.container.rotation = posicionActual;
     };
 
-    // Agrega la función `girar` al ticker de PixiJS para animar la ruleta
+    // Añadimos la función 'girar' al ticker de PIXI para que se ejecute en cada frame.
     this.app.ticker.add(girar);
 }
 
-calcularVelocidadInicialParaSegmentoGanador(indexSegmentoGanador: number, duracion: number): number {
-  // Encuentra el ángulo actual de la ruleta
-  const anguloActual = this.container.rotation % (2 * Math.PI);
 
-  // Encuentra el ángulo del segmento ganador
-  const anguloSegmentoGanador = (2 * Math.PI / this.segmentos) * indexSegmentoGanador + 
-                                (2 * Math.PI / this.segmentos) / 2; // Punto medio del segmento
-
-  // Calcula la distancia angular necesaria para llegar al segmento ganador
-  let distanciaAngular = anguloSegmentoGanador - anguloActual;
-
-  // Asegura que la distancia angular sea positiva para girar siempre en sentido de las agujas del reloj
-  if (distanciaAngular > 0) distanciaAngular += 2 * Math.PI;
-
-  // Asegura al menos una vuelta completa más la distancia hasta el segmento ganador
-  distanciaAngular += 2 * Math.PI; // Ajusta este valor para más vueltas
-
-  // Calcula la velocidad inicial necesaria para cubrir esa distancia en el tiempo dado
-  // Ajusta la fórmula según necesites para controlar la desaceleración
-  const velocidadInicial = distanciaAngular / (duracion / 1000); // Convierte duracion a segundos
-
-  // Ajusta para garantizar un mínimo de velocidad si es demasiado baja
-  const velocidadMinima = 2 * Math.PI; // Por ejemplo, al menos una vuelta por segundo
-  return Math.max(velocidadInicial, velocidadMinima);
-}
 
   obtenerSiguientePremio(): number | null {
     if (this.premiosGanadores.length > 0) {

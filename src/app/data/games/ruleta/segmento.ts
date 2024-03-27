@@ -87,7 +87,7 @@ export class Segmento {
 
      crearBorde(texture) {
       const woodBorder = new PIXI.Graphics();
-      woodBorder.lineStyle({ width: 20, color: 0xFFFFFF, texture: texture }); // Ajusta el ancho del borde según sea necesario
+      woodBorder.lineStyle({ width: 10, color: 0xFFFFFF, texture: texture }); // Ajusta el ancho del borde según sea necesario
       woodBorder.moveTo(this.centro.x, this.centro.y);
       woodBorder.arc(this.centro.x, this.centro.y, this.radio, this.anguloInicio, this.anguloFin);
       woodBorder.lineTo(this.centro.x, this.centro.y);

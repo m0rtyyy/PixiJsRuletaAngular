@@ -2,6 +2,7 @@ import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy } from '@ang
 import * as PIXI from 'pixi.js';
 import { GameConfig } from './config';
 import { Ruleta } from './ruleta';
+import { EfectoLluvia } from './efectolluvia';
 
 import { AnimatedSprite, Application, Assets, ResolverAssetsObject, Texture } from 'pixi.js';
 
@@ -21,6 +22,8 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
   loading = 0;
   gameAssets: any;
   ruleta:any;
+  centroRuletaX:any;
+  centroRuletaY:any;
 
   premios:any =[
     {
@@ -28,58 +31,69 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
       nombre:'Mojito',
       salida: [1,2,3],
       color:null,
-      img: 'mojito'
+      img: 'mojito',
+      ico: 'mojitoico'
+
     },
     {
       id:2,
       nombre:'Chupito',
       orden: [4,5,6],
       color:null,
-      img: 'chupito'
+      img: 'chupito',
+      ico: 'chupitoico'
     },
     {
       id:3,
       nombre:'Cerveza',
       orden: [7,8,9],
       color:null,
-      img: 'cerveza'
+      img: 'cerveza',
+      ico: 'cervezaico'
     },
     {
       id:4,
       nombre:'Copa',
       orden: [7,8,9],
       color:null,
-      img: 'copa'
+      img: 'copa',
+      ico: 'copaico'
     },
     {
       id:5,
       nombre:'Refresco',
       orden: [7,8,9],
       color:null,
-      img: 'refresco'
+      img: 'refresco',
+      ico: 'refrescoico'
     },
     {
       id:6,
       nombre:'Mystery Box',
       orden: [7,8,9],
       color:null,
-      img: 'mysterybox'
+      img: 'mysterybox',
+      ico: 'mysteryboxico'
     },
     {
       id:7,
       nombre:'Tu canción',
       orden: [7,8,9],
       color:null,
-      img: 'tucancion'
+      img: 'tucancion',
+      ico: 'tucancionico'
     },
     {
       id:8,
       nombre:'Nada',
       orden: [7,8,9],
       color:null,
-      img: 'nada'
+      img: 'nada',
+      ico: ''
     }
   ]
+
+  efectoLluvia:any;
 
 
   ngAfterViewInit(): void {
@@ -92,14 +106,23 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
     // Definir todos los assets necesarios, incluidas las imágenes de los segmentos
     const assets: PIXI.ResolverAssetsObject = {
       'bg': 'assets/sprites/bg.png',
+      'madera': 'assets/sprites/madera.jpg',
+      'logo':'assets/sprites/logo.png',
       'flecha': 'assets/sprites/flecha.png',
       'mojito': 'assets/sprites/mojito.jpg',
+      'mojitoico': 'assets/sprites/mojitoico.png',
       'chupito': 'assets/sprites/chupito.jpg',
+      'chupitoico': 'assets/sprites/chupitoico.png',
       'cerveza': 'assets/sprites/cerveza.jpg',
+      'cervezaico': 'assets/sprites/cervezaico.png',
       'copa': 'assets/sprites/copa.jpg',
+      'copaico': 'assets/sprites/copaico.png',
       'refresco': 'assets/sprites/refresco.jpg',
+      'refrescoico': 'assets/sprites/refrescoico.png',
       'tucancion': 'assets/sprites/tucancion.jpg',
+      'tucancionico': 'assets/sprites/tucancionico.png',
       'mysterybox': 'assets/sprites/mysterybox.jpg',
+      'mysteryboxico': 'assets/sprites/mysteryboxico.png',
       'nada': 'assets/sprites/nada.jpg'
     };
   
@@ -113,6 +136,8 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
   
     this.createBackground();
     this.crearRuleta();
+    this.crearLogo();
+    this.crearEfectoLluvia();
   }
 
 
@@ -146,7 +171,7 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
     resize();
   }
 
-createBackground() {
+  createBackground() {
     const texture = PIXI.Assets.get('bg'); // Usando el nombre del asset directamente
     if (texture) {
         const bgSprite = new PIXI.Sprite(texture);
@@ -154,7 +179,7 @@ createBackground() {
         bgSprite.width = this.container.offsetWidth;
         bgSprite.height = this.container.offsetHeight;
     }
-}
+  }
 
   crearRuleta() {
     // Define el margen superior e inferior deseado.
@@ -170,16 +195,43 @@ createBackground() {
     
     // El centro en Y se calcula para mantener el margen superior de 50px.
     // Es importante ajustar este cálculo si cambias el margen inferior.
-    const centroY = margenSuperior + radio - 35;
+    this.centroRuletaY = margenSuperior + radio - 35;
+
+    this.centroRuletaX = this.parent.offsetWidth / 2;
     
     // Asegúrate de que el centro y el radio calculados se ajustan a tus necesidades.
-    const centro = { x: this.parent.offsetWidth / 2, y: centroY };
+    const centro = { x: this.centroRuletaX, y: this.centroRuletaY };
     
     // Crea la ruleta con el nuevo centro y radio.
     this.ruleta = new Ruleta(this.app, radio, centro);
     this.container.addEventListener('pointerup', () => this.ruleta.girarRuleta(30));
 
     this.ruleta.generarRuleta(this.premios); // Pasamos el array completo de premios
+  }
+
+
+  crearLogo() {
+    const textureLogo = PIXI.Assets.get("logo"); // Asegúrate de que "logo" sea la clave correcta en tus assets.
+    if (textureLogo) {
+        const logoSprite = new PIXI.Sprite(textureLogo);
+        
+        // Configura el tamaño del logo si es necesario. Ejemplo: logoSprite.width = 100; logoSprite.height = 100;
+        logoSprite.width = 60; 
+        logoSprite.height = 60;
+        // Posiciona el logo en el centro de la ruleta. Asume que el ancla del sprite es (0.5, 0.5) para centrarlo correctamente.
+        logoSprite.anchor.set(0.5);
+        logoSprite.x = this.centroRuletaX;
+        logoSprite.y = this.centroRuletaY;
+        
+        // Añade el logo al escenario principal, no al contenedor de la ruleta, para que no gire con ella.
+        this.app.stage.addChild(logoSprite);
+    }
+  }
+
+  crearEfectoLluvia(){
+    // En tu componente, después de cargar los recursos y crear la aplicación PIXI:
+      this.efectoLluvia = new EfectoLluvia(this.app, this.premios);
+      this.efectoLluvia.iniciarLluvia();
   }
   
 
@@ -191,6 +243,7 @@ createBackground() {
 
   ngOnDestroy(): void {
     window.removeEventListener('resize', this.resizeApp.bind(this));
+    this.efectoLluvia.detenerLluvia();
     this.app.destroy();
   }
 }

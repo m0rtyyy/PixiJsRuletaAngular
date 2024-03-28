@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js';
 import { Segmento } from './segmento'; // Ajusta la ruta de importación según sea necesario
 import { Flecha } from './flecha';
+import { Howl } from 'howler';
 
 
 export class Ruleta {
@@ -16,6 +17,11 @@ export class Ruleta {
      // Agrega esta variable a tu clase Ruleta para rastrear la posición final después de cada giro.
      anguloActual: number = 0;
 
+       sonidoCambioSegmento = new Howl({
+    src: ['assets/sounds/click.mp3']
+    });
+    ultimoSegmentoApuntado: number | null = null;
+    segmentoActualId:any;
     
     constructor(app: PIXI.Application, radio: number, centro: { x: number; y: number }) {
       this.app = app;
@@ -25,6 +31,10 @@ export class Ruleta {
       this.container = new PIXI.Container(); // Inicializa el contenedor
       this.container.interactive = true;
       this.app.stage.addChild(this.container); // Añade el contenedor al escenario
+      // Agrega la llamada a detectarCambioSegmento en el ticker de PIXI
+      this.app.ticker.add(() => {
+        this.detectarCambioSegmento();
+      });
     }
   
     generarRuleta(premios: any[]): void {
@@ -113,47 +123,47 @@ export class Ruleta {
   }
 
 
-girarRuleta(vueltas: number): void {
-  let premioID = this.obtenerSiguientePremio(); // Devuelve el ID del premio
-  let indiceSegmentoObjetivo = this.premios.findIndex(p => p.id === premioID);
-  
-  // Calculamos el ángulo por segmento basado en el número total de premios.
-  const anguloPorSegmento = (2 * Math.PI) / this.premios.length;
+  girarRuleta(vueltas: number): void {
+    let premioID = this.obtenerSiguientePremio(); // Devuelve el ID del premio
+    let indiceSegmentoObjetivo = this.premios.findIndex(p => p.id === premioID);
+    
+    // Calculamos el ángulo por segmento basado en el número total de premios.
+    const anguloPorSegmento = (2 * Math.PI) / this.premios.length;
 
-  // El ángulo objetivo ajusta para que la flecha termine en la bisectriz del segmento ganador.
-  // Consideramos el ángulo inicial de la ruleta para que la flecha apunte al inicio del primer segmento.
-  let anguloObjetivo = -Math.PI / 2 + anguloPorSegmento * (-(indiceSegmentoObjetivo)) - anguloPorSegmento / 2;
+    // El ángulo objetivo ajusta para que la flecha termine en la bisectriz del segmento ganador.
+    // Consideramos el ángulo inicial de la ruleta para que la flecha apunte al inicio del primer segmento.
+    let anguloObjetivo = -Math.PI / 2 + anguloPorSegmento * (-(indiceSegmentoObjetivo)) - anguloPorSegmento / 2;
 
-  // Añadimos vueltas extra para hacer el giro más interesante.
-  anguloObjetivo += vueltas * 2 * Math.PI;
+    // Añadimos vueltas extra para hacer el giro más interesante.
+    anguloObjetivo += vueltas * 2 * Math.PI;
 
-  // Aseguramos que el giro sea en sentido horario ajustando la rotación final.
-  let diferenciaAngulo = anguloObjetivo - (this.container.rotation % (2 * Math.PI));
-  if (diferenciaAngulo < 0) diferenciaAngulo += 2 * Math.PI;
+    // Aseguramos que el giro sea en sentido horario ajustando la rotación final.
+    let diferenciaAngulo = anguloObjetivo - (this.container.rotation % (2 * Math.PI));
+    if (diferenciaAngulo < 0) diferenciaAngulo += 2 * Math.PI;
 
-  let duracion = 5; // Duración de la animación en segundos.
-  let tiempoInicial = Date.now();
-  let anguloInicial = this.container.rotation;
+    let duracion = 5; // Duración de la animación en segundos.
+    let tiempoInicial = Date.now();
+    let anguloInicial = this.container.rotation;
 
-  const girar = () => {
-    let ahora = Date.now();
-    let tiempoTranscurrido = (ahora - tiempoInicial) / 1000; // Convertimos a segundos.
-    let fraccion = tiempoTranscurrido / duracion;
+    const girar = () => {
+      let ahora = Date.now();
+      let tiempoTranscurrido = (ahora - tiempoInicial) / 1000; // Convertimos a segundos.
+      let fraccion = tiempoTranscurrido / duracion;
 
-    if (fraccion >= 1) {
-      this.container.rotation = anguloInicial + diferenciaAngulo; // Asegura terminar en el ángulo objetivo.
-      this.app.ticker.remove(girar);
-      console.log("Animación completada");
-      return;
-    }
+      if (fraccion >= 1) {
+        this.container.rotation = anguloInicial + diferenciaAngulo; // Asegura terminar en el ángulo objetivo.
+        this.app.ticker.remove(girar);
+        console.log("Animación completada");
+        return;
+      }
 
-    // Aplicamos una función de easing para suavizar la animación.
-    let posicionActual = anguloInicial + diferenciaAngulo * (1 - Math.pow(1 - fraccion, 3));
-    this.container.rotation = posicionActual;
-  };
+      // Aplicamos una función de easing para suavizar la animación.
+      let posicionActual = anguloInicial + diferenciaAngulo * (1 - Math.pow(1 - fraccion, 3));
+      this.container.rotation = posicionActual;
+    };
 
-  this.app.ticker.add(girar);
-}
+    this.app.ticker.add(girar);
+  }
 
 
 //Obtiene de nuestro array de premios el segmento que tiene que salir en la tirada
@@ -167,6 +177,20 @@ girarRuleta(vueltas: number): void {
     }
   }
   
+
+  detectarCambioSegmento() {
+    // Suponiendo que getSegmentoApuntadoPorFlecha() devuelve el segmento actual
+    const segmentoApuntado = this.getSegmentoApuntadoPorFlecha();
+    if (segmentoApuntado && segmentoApuntado.id !== this.segmentoActualId) {
+      // Si el segmento apuntado ha cambiado, reproduce el sonido
+      this.sonidoCambioSegmento.play();
+      
+      // Actualiza el ID del segmento actual
+      this.segmentoActualId = segmentoApuntado.id;
+    }
+  }
+
+
   limpiarSegmentos(): void {
     this.segmentosInstancias.forEach(segmento => {
         segmento.destruir();

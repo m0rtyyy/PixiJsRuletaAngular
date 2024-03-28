@@ -96,6 +96,8 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
   efectoLluvia:any;
 
 
+
+
   ngAfterViewInit(): void {
     this.initializePixiApp();
     this.loadResources();
@@ -123,7 +125,8 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
       'tucancionico': 'assets/sprites/tucancionico.png',
       'mysterybox': 'assets/sprites/mysterybox.jpg',
       'mysteryboxico': 'assets/sprites/mysteryboxico.png',
-      'nada': 'assets/sprites/nada.jpg'
+      'nada': 'assets/sprites/nada.jpg',
+      'sonidogiro' : 'assets/sounds/click.mp3'
     };
   
     // Añadir todos los assets al bundle
@@ -233,7 +236,6 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
       this.efectoLluvia = new EfectoLluvia(this.app, this.premios);
       this.efectoLluvia.iniciarLluvia();
   }
-  
 
   destruirRuleta() {
     if (this.ruleta) {

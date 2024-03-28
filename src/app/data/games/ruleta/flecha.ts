@@ -6,6 +6,7 @@ export class Flecha {
     private radio: number;
     public container: PIXI.Container;
     private imagenURL: string; // URL de la imagen de la flecha
+
   
     constructor(app: PIXI.Application, centro: { x: number; y: number }, radio: number) {
         this.app = app;
@@ -13,6 +14,7 @@ export class Flecha {
         this.radio = radio;
         this.imagenURL = 'flecha'; // Guarda la URL de la imagen
         this.container = new PIXI.Container(); // Contenedor para la flecha
+        
 
         this.cargarImagenFlecha();
     }

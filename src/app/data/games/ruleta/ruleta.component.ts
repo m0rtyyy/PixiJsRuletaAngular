@@ -5,6 +5,7 @@ import { Ruleta } from './ruleta';
 import { EfectoLluvia } from './efectolluvia';
 
 import { AnimatedSprite, Application, Assets, ResolverAssetsObject, Texture } from 'pixi.js';
+import { PantallaIntro } from './pantallaInicio';
 
 @Component({
   selector: 'app-ruleta',
@@ -18,12 +19,15 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
   parent:any;
 
   //AJUSTES ESENCIALES
+  loadingProgressBar:any;
   container:any;
   loading = 0;
   gameAssets: any;
+  pantallaintro:any;
   ruleta:any;
   centroRuletaX:any;
   centroRuletaY:any;
+  radioRuleta:any;
 
   premios:any =[
     {
@@ -103,10 +107,11 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
     this.loadResources();
   }
 
-
   async loadResources() {
-    // Definir todos los assets necesarios, incluidas las imágenes de los segmentos
+    this.initializeLoadingBar(); // Inicializa la barra de carga
+    // Definir todos los assets necesarios
     const assets: PIXI.ResolverAssetsObject = {
+      'pantcarga': 'assets/sprites/pantcarga.png',
       'bg': 'assets/sprites/bg.png',
       'madera': 'assets/sprites/madera.jpg',
       'logo':'assets/sprites/logo.png',
@@ -126,20 +131,39 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
       'mysterybox': 'assets/sprites/mysterybox.jpg',
       'mysteryboxico': 'assets/sprites/mysteryboxico.png',
       'nada': 'assets/sprites/nada.jpg',
+      'tirarBoton': 'assets/sprites/tirarBoton.png',
       'sonidogiro' : 'assets/sounds/click.mp3'
     };
-  
-    // Añadir todos los assets al bundle
+
     Assets.addBundle('miJuego', assets);
-  
-    // Cargar el bundle
+
+    // Cargar el bundle y actualizar la barra de progreso con el porcentaje
     this.gameAssets = await Assets.loadBundle('miJuego', (loadingPercentage) => {
-      this.loading = Math.floor(loadingPercentage * 100);
+        const barWidth = 300; // El mismo ancho definido en initializeLoadingBar
+        this.loadingProgressBar.clear();
+        this.loadingProgressBar.beginFill(0xFFFFFF); // Color de la barra de progreso
+        this.loadingProgressBar.drawRect((this.app.screen.width - barWidth) / 2, (this.app.screen.height - 20) / 2, barWidth * loadingPercentage, 20);
+        this.loadingProgressBar.endFill();
     });
-  
+    // Una vez cargado todo, puedes eliminar el texto de carga o hacer cualquier otra cosa como iniciar el juego
+    this.app.stage.removeChild(this.loadingProgressBar);
+
+    this.pantallaintro = new PantallaIntro(
+      this.app,
+      () => this.iniciarJuego(), // Aquí defines qué hacer cuando se presiona JUGAR
+      () => console.log('Mostrar INFO'), // INFO callback
+      () => console.log('SALIR del juego') // SALIR callback
+    );
+}
+
+  iniciarJuego() {
+    // Aquí puedes llamar a createBackground, crearRuleta, etc.
+    // y cualquier otra lógica de inicialización del juego
+    this.pantallaintro.ocultar();
     this.createBackground();
     this.crearRuleta();
     this.crearLogo();
+    this.crearBotonJugar();
     this.crearEfectoLluvia();
   }
 
@@ -174,6 +198,31 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
     resize();
   }
 
+  initializeLoadingBar() {
+    // Configuración de la barra de carga
+    const barWidth = 300;
+    const barHeight = 20;
+    const posX = (this.app.screen.width - barWidth) / 2; // Centrar en pantalla
+    const posY = (this.app.screen.height - barHeight) / 2;
+
+    // Fondo de la barra de carga
+    const loadingBarBackground = new PIXI.Graphics();
+    loadingBarBackground.beginFill(0x000000); // Color de fondo
+    loadingBarBackground.drawRect(posX, posY, barWidth, barHeight);
+    loadingBarBackground.endFill();
+    this.app.stage.addChild(loadingBarBackground);
+
+    // Barra de progreso (inicialmente vacía)
+    const loadingProgressBar = new PIXI.Graphics();
+    loadingProgressBar.beginFill(0xFFFFFF); // Color de la barra de progreso
+    loadingProgressBar.drawRect(posX, posY, 1, barHeight); // Iniciar con un ancho de 1
+    loadingProgressBar.endFill();
+    this.app.stage.addChild(loadingProgressBar);
+
+    // Guarda la barra de progreso en una propiedad para actualizarla más tarde
+    this.loadingProgressBar = loadingProgressBar;
+}
+
   createBackground() {
     const texture = PIXI.Assets.get('bg');
     if (texture) {
@@ -206,6 +255,7 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
     
     // El radio es el menor valor entre la mitad del ancho del contenedor y la mitad del espacio vertical disponible.
     const radio = Math.min(this.parent.offsetWidth / 2, espacioVerticalDisponible / 2);
+    this.radioRuleta = radio;
     
     // El centro en Y se calcula para mantener el margen superior de 50px.
     // Es importante ajustar este cálculo si cambias el margen inferior.
@@ -218,7 +268,7 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
     
     // Crea la ruleta con el nuevo centro y radio.
     this.ruleta = new Ruleta(this.app, radio, centro);
-    this.container.addEventListener('pointerup', () => this.ruleta.girarRuleta(30));
+    // this.container.addEventListener('pointerup', () => this.ruleta.girarRuleta(30));
 
     this.ruleta.generarRuleta(this.premios); // Pasamos el array completo de premios
   }
@@ -236,9 +286,31 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
         logoSprite.anchor.set(0.5);
         logoSprite.x = this.centroRuletaX;
         logoSprite.y = this.centroRuletaY;
+
         
         // Añade el logo al escenario principal, no al contenedor de la ruleta, para que no gire con ella.
         this.app.stage.addChild(logoSprite);
+    }
+  }
+
+  crearBotonJugar() {
+    const textureBoton = PIXI.Assets.get("tirarBoton"); // Asegúrate de que "logo" sea la clave correcta en tus assets.
+    if (textureBoton) {
+        const botonSprite = new PIXI.Sprite(textureBoton);
+        
+        // Configura el tamaño del logo si es necesario. Ejemplo: logoSprite.width = 100; logoSprite.height = 100;
+        botonSprite.width = 150; 
+        botonSprite.height = 60;
+        // Posiciona el logo en el centro de la ruleta. Asume que el ancla del sprite es (0.5, 0.5) para centrarlo correctamente.
+        botonSprite.anchor.set(0.5);
+        botonSprite.x = this.centroRuletaX;
+        botonSprite.y = this.parent.offsetHeight -70;
+        botonSprite.interactive = true;
+        botonSprite.addEventListener('pointerup', () => this.ruleta.girarRuleta(10));
+
+        
+        // Añade el logo al escenario principal, no al contenedor de la ruleta, para que no gire con ella.
+        this.app.stage.addChild(botonSprite);
     }
   }
 

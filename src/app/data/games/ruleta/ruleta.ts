@@ -13,7 +13,7 @@ export class Ruleta {
      segmentosInstancias: Segmento[] = [];
      flecha: any;
      premios:any;
-     premiosGanadores = [1, 2, 8, 3, 4]; // Por ejemplo, los id de los segmentos
+     premiosGanadores = [6, 8, 1, 7, 8]; // Por ejemplo, los id de los segmentos
      // Agrega esta variable a tu clase Ruleta para rastrear la posición final después de cada giro.
      anguloActual: number = 0;
 

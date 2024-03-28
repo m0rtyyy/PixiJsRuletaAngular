@@ -175,14 +175,25 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
   }
 
   createBackground() {
-    const texture = PIXI.Assets.get('bg'); // Usando el nombre del asset directamente
+    const texture = PIXI.Assets.get('bg');
     if (texture) {
-        const bgSprite = new PIXI.Sprite(texture);
+        // Asume que el fondo se repite y es más ancho que el contenedor
+        texture.baseTexture.wrapMode = PIXI.WRAP_MODES.REPEAT; // Permite que la textura se repita
+        const bgSprite = new PIXI.TilingSprite(texture, this.container.offsetWidth, this.container.offsetHeight);
+
+        // Configura la posición inicial del sprite de fondo
+        bgSprite.position.set(0, 0);
         this.app.stage.addChild(bgSprite);
-        bgSprite.width = this.container.offsetWidth;
-        bgSprite.height = this.container.offsetHeight;
+
+        // Velocidad a la que se moverá el fondo. Ajusta este valor según lo rápido que desees que se mueva
+        const velocidadFondo = 1;
+
+        this.app.ticker.add((delta) => {
+            // Mueve el fondo una cantidad fija en cada frame. La multiplicación por `delta` asegura un movimiento suave independientemente del framerate
+            bgSprite.tilePosition.x -= velocidadFondo * delta;
+        });
     }
-  }
+}
 
   crearRuleta() {
     // Define el margen superior e inferior deseado.

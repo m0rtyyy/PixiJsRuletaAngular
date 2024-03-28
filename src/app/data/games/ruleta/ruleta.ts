@@ -46,13 +46,6 @@ export class Ruleta {
       this.flecha = new Flecha(this.app, this.centro, this.radio);
       console.log(this.segmentosInstancias);
       console.log(this.getSegmentoApuntadoPorFlecha());
-      
-
-
-      
-
-      // No necesitas crear la Flecha aquí si va a ser un elemento estático fuera del contenedor de la ruleta
-      // const flecha = new Flecha(this.app, this.centro, this.radio);
   }
 
   //Crea los segmentos que conforma la ruleta

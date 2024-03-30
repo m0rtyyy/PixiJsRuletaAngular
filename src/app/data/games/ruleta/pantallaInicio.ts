@@ -67,12 +67,21 @@ export class PantallaIntro {
     }
 
     public ocultar() {
-        console.log('ocultando');
-        
-        // Método público para ocultar la pantalla introductoria
-        this.app.stage.removeChild(this.fondo);
-        this.app.stage.removeChild(this.botonJugar);
-        this.app.stage.removeChild(this.botonInfo);
-        this.app.stage.removeChild(this.botonSalir);
+        // this.fondo.visible = false;
+        this.botonJugar.visible = false;
+        this.botonInfo.visible = false;
+        this.botonSalir.visible = false;
     }
+
+    public mostrar() {
+        // this.fondo.visible = true;
+        this.botonJugar.visible = true;
+        this.botonInfo.visible = true;
+        this.botonSalir.visible = true;
+    }
+
+
+    
+
+
 }

@@ -6,6 +6,7 @@ import { EfectoLluvia } from './efectolluvia';
 
 import { AnimatedSprite, Application, Assets, ResolverAssetsObject, Texture } from 'pixi.js';
 import { PantallaIntro } from './pantallaInicio';
+import { PantallaInfo } from './pantallainfo';
 
 @Component({
   selector: 'app-ruleta',
@@ -151,7 +152,7 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
     this.pantallaintro = new PantallaIntro(
       this.app,
       () => this.iniciarJuego(), // Aquí defines qué hacer cuando se presiona JUGAR
-      () => console.log('Mostrar INFO'), // INFO callback
+      () => this.mostrarPantallaInfo(), // INFO callback
       () => console.log('SALIR del juego') // SALIR callback
     );
 }
@@ -166,6 +167,20 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
     this.crearBotonJugar();
     this.crearEfectoLluvia();
   }
+
+  mostrarPantallaInfo(){
+    if (this.pantallaintro) {
+        this.pantallaintro.ocultar();
+    }
+    const pantallaInfo = new PantallaInfo(this.app, this.mostrarPantallaIntro.bind(this));
+    pantallaInfo.mostrar();
+}
+
+mostrarPantallaIntro() {
+  if (this.pantallaintro) {
+      this.pantallaintro.mostrar();
+  }
+}
 
 
   private initializePixiApp(): void {

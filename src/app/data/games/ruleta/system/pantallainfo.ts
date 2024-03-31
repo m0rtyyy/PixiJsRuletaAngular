@@ -82,7 +82,8 @@ export class PantallaInfo {
         });
 
         texto.x = this.app.screen.width / 2;
-        texto.y = (this.app.screen.height - texto.height) + texto.height/4; // Ajustar posición Y basado en la altura del texto
+        // texto.y = (this.app.screen.height - texto.height) + texto.height/4; // Ajustar posición Y basado en la altura del texto
+        texto.y = 100 + texto.height / 2;
         texto.anchor.set(0.5);
 
         this.infoContainer.addChild(texto);

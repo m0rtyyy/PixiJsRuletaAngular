@@ -1,12 +1,12 @@
 import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 import * as PIXI from 'pixi.js';
-import { GameConfig } from './config';
+import { GameConfig } from './system/config';
 import { Ruleta } from './ruleta';
-import { EfectoLluvia } from './efectolluvia';
+import * as Howler from 'howler';
 
 import { AnimatedSprite, Application, Assets, ResolverAssetsObject, Texture } from 'pixi.js';
-import { PantallaIntro } from './pantallaInicio';
-import { PantallaInfo } from './pantallainfo';
+import { PantallaIntro } from './system/pantallaInicio';
+import { PantallaInfo } from './system/pantallainfo';
 
 @Component({
   selector: 'app-ruleta',
@@ -30,75 +30,8 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
   centroRuletaY:any;
   radioRuleta:any;
 
-  premios:any =[
-    {
-      id:1,
-      nombre:'Mojito',
-      salida: [1,2,3],
-      color:null,
-      img: 'mojito',
-      ico: 'mojitoico'
+  premios:any = GameConfig.premios;
 
-    },
-    {
-      id:2,
-      nombre:'Chupito',
-      orden: [4,5,6],
-      color:null,
-      img: 'chupito',
-      ico: 'chupitoico'
-    },
-    {
-      id:3,
-      nombre:'Cerveza',
-      orden: [7,8,9],
-      color:null,
-      img: 'cerveza',
-      ico: 'cervezaico'
-    },
-    {
-      id:4,
-      nombre:'Copa',
-      orden: [7,8,9],
-      color:null,
-      img: 'copa',
-      ico: 'copaico'
-    },
-    {
-      id:5,
-      nombre:'Refresco',
-      orden: [7,8,9],
-      color:null,
-      img: 'refresco',
-      ico: 'refrescoico'
-    },
-    {
-      id:6,
-      nombre:'Mystery Box',
-      orden: [7,8,9],
-      color:null,
-      img: 'mysterybox',
-      ico: 'mysteryboxico'
-    },
-    {
-      id:7,
-      nombre:'Tu canción',
-      orden: [7,8,9],
-      color:null,
-      img: 'tucancion',
-      ico: 'tucancionico'
-    },
-    {
-      id:8,
-      nombre:'Nada',
-      orden: [7,8,9],
-      color:null,
-      img: 'nada',
-      ico: ''
-    }
-  ]
-
-  efectoLluvia:any;
 
 
 
@@ -106,6 +39,7 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this.initializePixiApp();
     this.loadResources();
+
   }
 
   async loadResources() {
@@ -116,6 +50,8 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
       'bg': 'assets/sprites/bg.png',
       'madera': 'assets/sprites/madera.jpg',
       'logo':'assets/sprites/logo.png',
+      'soundon' : 'assets/sprites/soundon.png',
+      'soundoff' : 'assets/sprites/soundoff.png',
       'flecha': 'assets/sprites/flecha.png',
       'mojito': 'assets/sprites/mojito.jpg',
       'mojitoico': 'assets/sprites/mojitoico.png',
@@ -133,7 +69,8 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
       'mysteryboxico': 'assets/sprites/mysteryboxico.png',
       'nada': 'assets/sprites/nada.jpg',
       'tirarBoton': 'assets/sprites/tirarBoton.png',
-      'sonidogiro' : 'assets/sounds/click.mp3'
+      'sonidogiro' : 'assets/sounds/click.mp3',
+
     };
 
     Assets.addBundle('miJuego', assets);
@@ -155,6 +92,10 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
       () => this.mostrarPantallaInfo(), // INFO callback
       () => console.log('SALIR del juego') // SALIR callback
     );
+
+    this.crearBotonMute();
+
+
 }
 
   iniciarJuego() {
@@ -164,8 +105,7 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
     this.createBackground();
     this.crearRuleta();
     this.crearLogo();
-    this.crearBotonJugar();
-    this.crearEfectoLluvia();
+    this.crearBotonMute();
   }
 
   mostrarPantallaInfo(){
@@ -176,11 +116,11 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
     pantallaInfo.mostrar();
 }
 
-mostrarPantallaIntro() {
-  if (this.pantallaintro) {
-      this.pantallaintro.mostrar();
+  mostrarPantallaIntro() {
+    if (this.pantallaintro) {
+        this.pantallaintro.mostrar();
+    }
   }
-}
 
 
   private initializePixiApp(): void {
@@ -308,32 +248,40 @@ mostrarPantallaIntro() {
     }
   }
 
-  crearBotonJugar() {
-    const textureBoton = PIXI.Assets.get("tirarBoton"); // Asegúrate de que "logo" sea la clave correcta en tus assets.
-    if (textureBoton) {
-        const botonSprite = new PIXI.Sprite(textureBoton);
-        
-        // Configura el tamaño del logo si es necesario. Ejemplo: logoSprite.width = 100; logoSprite.height = 100;
-        botonSprite.width = 150; 
-        botonSprite.height = 60;
-        // Posiciona el logo en el centro de la ruleta. Asume que el ancla del sprite es (0.5, 0.5) para centrarlo correctamente.
-        botonSprite.anchor.set(0.5);
-        botonSprite.x = this.centroRuletaX;
-        botonSprite.y = this.parent.offsetHeight -70;
-        botonSprite.interactive = true;
-        botonSprite.addEventListener('pointerup', () => this.ruleta.girarRuleta(10));
+  crearBotonMute() {
+    
+    // Cargar las texturas para los estados de sonido activado y desactivado
+    const textureSonidoOn = PIXI.Assets.get("soundon"); // Asegúrate de que "logo" sea la clave correcta en tus assets.
+    const textureSonidoOff = PIXI.Assets.get("soundoff");
+    console.log(textureSonidoOn);
+    // Crear el sprite del botón, inicialmente con la textura de sonido activado
+    const botonMute = new PIXI.Sprite(textureSonidoOn);
+    botonMute.x =  this.parent.offsetWidth-botonMute.width; // 20px desde el borde derecho
+    botonMute.y = this.parent.offsetHeight-botonMute.height; // 20px desde el borde inferior
+    botonMute.width= 40;
+    botonMute.height = 40;
 
-        
-        // Añade el logo al escenario principal, no al contenedor de la ruleta, para que no gire con ella.
-        this.app.stage.addChild(botonSprite);
-    }
+    botonMute.interactive = true;
+
+    // Posiciona el logo en el centro de la ruleta. Asume que el ancla del sprite es (0.5, 0.5) para centrarlo correctamente.
+    botonMute.anchor.set(0.5);
+
+
+    // Agregar funcionalidad para alternar el sonido
+    let sonidoActivo = true;
+    botonMute.on('pointerdown', () => {
+      sonidoActivo = !sonidoActivo;
+      botonMute.texture = sonidoActivo ? textureSonidoOn : textureSonidoOff;
+  
+      // Para silenciar o activar todos los sonidos globalmente
+      Howler.mute(!sonidoActivo);
+  });
+    botonMute.zIndex = 99;
+
+    // Añadir el botón al escenario
+    this.app.stage.addChild(botonMute);
   }
 
-  crearEfectoLluvia(){
-    // En tu componente, después de cargar los recursos y crear la aplicación PIXI:
-      this.efectoLluvia = new EfectoLluvia(this.app, this.premios);
-      this.efectoLluvia.iniciarLluvia();
-  }
 
   destruirRuleta() {
     if (this.ruleta) {
@@ -343,7 +291,6 @@ mostrarPantallaIntro() {
 
   ngOnDestroy(): void {
     window.removeEventListener('resize', this.resizeApp.bind(this));
-    this.efectoLluvia.detenerLluvia();
     this.app.destroy();
   }
 }

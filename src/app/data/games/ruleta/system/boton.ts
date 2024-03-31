@@ -1,5 +1,7 @@
 import * as PIXI from 'pixi.js';
 import { gsap } from 'gsap';
+import { Howl } from 'howler'; // Asegúrate de importar Howl
+
 
 export class Boton extends PIXI.Container {
     constructor(texto, x, y, callback) {
@@ -8,6 +10,11 @@ export class Boton extends PIXI.Container {
         this.x = x;
         this.y = y;
         this.interactive = true;
+
+        const sonidoBoton = new Howl({
+            src: ['assets/sounds/button.mp3'], // Asegúrate de poner la ruta correcta al archivo de audio
+            volume: 0.5, // Ajusta el volumen según necesites
+        });
 
         // Crear el fondo del botón con PIXI.Graphics
         const fondo = new PIXI.Graphics();
@@ -36,7 +43,10 @@ export class Boton extends PIXI.Container {
         this.addChild(textoBoton);
 
         // Interactividad
-        this.on('pointerdown', callback);
+        this.on('pointerdown', () => {
+            callback(); // Llama al callback proporcionado
+            sonidoBoton.play(); // Reproduce el sonido al hacer clic
+        });
         this.on('pointerover', () => gsap.to(this.scale, { x: 1.1, y: 1.1, duration: 0.2 }));
         this.on('pointerout', () => gsap.to(this.scale, { x: 1, y: 1, duration: 0.2 }));
     }

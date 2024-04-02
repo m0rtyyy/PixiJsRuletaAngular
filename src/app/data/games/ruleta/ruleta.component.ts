@@ -2,7 +2,7 @@ import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy } from '@ang
 import * as PIXI from 'pixi.js';
 import { GameConfig } from './system/config';
 import { Ruleta } from './ruleta';
-import * as Howler from 'howler';
+import { Howl, Howler } from 'howler';
 
 import { AnimatedSprite, Application, Assets, ResolverAssetsObject, Texture } from 'pixi.js';
 import { PantallaIntro } from './system/pantallaInicio';
@@ -270,12 +270,13 @@ export class RuletaComponent implements AfterViewInit, OnDestroy {
     // Agregar funcionalidad para alternar el sonido
     let sonidoActivo = true;
     botonMute.on('pointerdown', () => {
+      console.log("Estado del sonido antes de cambiar: ", sonidoActivo);
       sonidoActivo = !sonidoActivo;
+      console.log("Estado del sonido después de cambiar: ", sonidoActivo);
       botonMute.texture = sonidoActivo ? textureSonidoOn : textureSonidoOff;
-  
-      // Para silenciar o activar todos los sonidos globalmente
+      
       Howler.mute(!sonidoActivo);
-  });
+    });
     botonMute.zIndex = 99;
 
     // Añadir el botón al escenario
